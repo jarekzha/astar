@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
-
 	"github.com/pkg/errors"
 )
 

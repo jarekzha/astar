@@ -1,15 +1,16 @@
 package syncfinder
 
 import (
+	g "github.com/ewol123/go-path/pkg/grid"
+	 "github.com/ewol123/go-path/pkg/heap"
 	"math"
-
 	"github.com/pkg/errors"
 )
 
-var openList = Heap{}
+var openList = heap.Heap{}
 var startLoc int = 0
 var endLoc int = 0
-var grid = Grid{}
+var grid = g.Grid{}
 var locToClosed = make(map[int]bool)
 var locToOpen = make(map[int]bool)
 var locToG = make(map[int]float64)
@@ -48,14 +49,14 @@ func Backtrace(node int) ([]int, [][]int) {
 	return path, coordPath
 }
 
-type Syncfinder struct{}
+type SyncFinder struct{}
 
-func (syncfinder *Syncfinder) FindPathByBrickLoc(start int, end int, theGrid Grid) ([]int, [][]int, error) {
-	return syncfinder.FindPath(start>>16, start&0xffff, end>>16, end&0xffff, theGrid, false, false)
+func (syncFinder *SyncFinder) FindPathByBrickLoc(start int, end int, theGrid g.Grid) ([]int, [][]int, error) {
+	return syncFinder.FindPath(start>>16, start&0xffff, end>>16, end&0xffff, theGrid, false, false)
 }
 
 // find a path of giving x, y brick locations
-func (syncfinder *Syncfinder) FindPath(startX int, startY int, endX int, endY int, theGrid Grid, allowDiagonal bool, dontCrossCorners bool) ([]int, [][]int, error) {
+func (syncFinder *SyncFinder) FindPath(startX int, startY int, endX int, endY int, theGrid g.Grid, allowDiagonal bool, dontCrossCorners bool) ([]int, [][]int, error) {
 
 	//validate args
 	if startX < 0 || startY < 0 || endX < 0 || endY < 0 {
