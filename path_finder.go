@@ -1,16 +1,15 @@
-package syncfinder
+package path
 
 import (
-	g "github.com/ewol123/go-path/pkg/grid"
-	 "github.com/ewol123/go-path/pkg/heap"
 	"math"
+
 	"github.com/pkg/errors"
 )
 
-var openList = heap.Heap{}
+var openList = Heap{}
 var startLoc int = 0
 var endLoc int = 0
-var grid = g.Grid{}
+var grid *Grid
 var locToClosed = make(map[int]bool)
 var locToOpen = make(map[int]bool)
 var locToG = make(map[int]float64)
@@ -49,14 +48,12 @@ func Backtrace(node int) ([]int, [][]int) {
 	return path, coordPath
 }
 
-type SyncFinder struct{}
-
-func (syncFinder *SyncFinder) FindPathByBrickLoc(start int, end int, theGrid g.Grid) ([]int, [][]int, error) {
-	return syncFinder.FindPath(start>>16, start&0xffff, end>>16, end&0xffff, theGrid, false, false)
+func FindPathByBrickLoc(start int, end int, theGrid *Grid) ([]int, [][]int, error) {
+	return FindPath(start>>16, start&0xffff, end>>16, end&0xffff, theGrid, false, false)
 }
 
 // find a path of giving x, y brick locations
-func (syncFinder *SyncFinder) FindPath(startX int, startY int, endX int, endY int, theGrid g.Grid, allowDiagonal bool, dontCrossCorners bool) ([]int, [][]int, error) {
+func FindPath(startX int, startY int, endX int, endY int, theGrid *Grid, allowDiagonal bool, dontCrossCorners bool) ([]int, [][]int, error) {
 
 	//validate args
 	if startX < 0 || startY < 0 || endX < 0 || endY < 0 {
@@ -106,7 +103,6 @@ func (syncFinder *SyncFinder) FindPath(startX int, startY int, endX int, endY in
 
 			// get the distance between current node and the neighbor
 			// and calculate the next g score
-
 			ng := locToG[node]
 
 			if x == nodeX || y == nodeY {
@@ -120,9 +116,7 @@ func (syncFinder *SyncFinder) FindPath(startX int, startY int, endX int, endY in
 			if locToOpen[neighbor] == false || (ng < locToG[neighbor]) {
 				locToG[neighbor] = ng
 
-				if locToH[neighbor] != 0 {
-					locToH[neighbor] = locToH[neighbor]
-				} else {
+				if locToH[neighbor] == 0 {
 					locToH[neighbor] = Heuristic(math.Abs(float64(x-endX)), math.Abs(float64(y-endY)))
 				}
 

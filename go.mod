@@ -1,4 +1,4 @@
-module github.com/ewol123/go-path
+module github.com/jarekzha/astar
 
 go 1.14
 

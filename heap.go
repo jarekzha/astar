@@ -1,17 +1,6 @@
-package heap
+package path
 
 //utils
-func indexOf(element int, data []int) int {
-	for k, v := range data {
-		if element == v {
-			return k
-		}
-	}
-	return -1 //not found.
-}
-
-//utils
-
 type Heap struct {
 	nodes  []int
 	locToF map[int]int
@@ -59,8 +48,18 @@ func (heap *Heap) siftUp(pos int) {
 	heap.siftDown(startPos, pos)
 }
 
+//utils
+func (heap *Heap) indexOf(element int) int {
+	for k, v := range heap.nodes {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
+}
+
 func (heap *Heap) UpdateItem(node int) {
-	pos := indexOf(node, heap.nodes)
+	pos := heap.indexOf(node)
 	if pos < 0 {
 		return
 	}
@@ -90,8 +89,7 @@ func (heap *Heap) Pop() int {
 }
 
 // reset the heap
-
 func (heap *Heap) Reset(locToF map[int]int) {
-	heap.nodes = make([]int, 0)
+	heap.nodes = heap.nodes[:0]
 	heap.locToF = locToF
 }

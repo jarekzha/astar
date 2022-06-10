@@ -1,6 +1,6 @@
 ## GO-PATH [WIP]
 
-A* pathfinding ported to Golang from Nodejs
+A* pathfinding and optional smoothing
 
 ## Usage
 
@@ -94,7 +94,3 @@ Dump: ░=walkable, ▓=blocked
 ▓░▓░░▓▓▓░▓▓▓░▓▓▓▓▓░▓▓▓▓▓▓▓▓▓░▓
 
 ```
-
-
-## Credits
-The original implementation can be found here: https://github.com/yi/node-path-finding

@@ -1,4 +1,4 @@
-package grid
+package path
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +31,7 @@ func BytesFrom2DArray(width int, height int, array2d [][]int) ([]byte, error) {
 	lenOfBuf := math.Ceil(bufW * bufH / 8)
 
 	buf := make([]byte, int(lenOfBuf))
-	for i, _ := range buf { // fill all bits as blocked
+	for i := range buf { // fill all bits as blocked
 		buf[i] = 255
 	}
 
