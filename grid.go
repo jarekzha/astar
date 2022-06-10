@@ -1,4 +1,4 @@
-package path
+package astar
 
 import (
 	"fmt"
@@ -70,7 +70,6 @@ func (grid *Grid) checkValues() error {
 // (Also returns false if the position is outside the grid.)
 // int x - The x coordinate of the node.
 // int y - The y coordinate of the node.
-
 func (grid *Grid) IsWalkableAt(x int, y int) bool {
 	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
 		return false
@@ -125,7 +124,6 @@ func (grid *Grid) SetWalkableAt(x int, y int, walkable bool) error {
 // bool allowDiagonal
 // bool dontCrossCorners
 // returns []int a list of walkable neighbors brick loc
-
 func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, dontCrossCorners bool) []int {
 
 	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
@@ -223,12 +221,13 @@ func (grid *Grid) GetRandomWalkableBrick() int {
 // @param  endLoc the end brick loc
 // @param  path array of point
 // returns a string to describe this instance
-
-func (grid *Grid) ToString(startLoc int, endLoc int, path []int) string {
+func (grid *Grid) ToString(startLoc int, endLoc int, path [][]int) string {
 	markpoints := make(map[int]string)
 
-	for i, brickLoc := range path {
-		markpoints[brickLoc] = strconv.Itoa(i % 10)
+	for i, loc := range path {
+		x := loc[0]
+		y := loc[1]
+		markpoints[x<<16|y] = strconv.Itoa(i % 10)
 	}
 
 	markpoints[startLoc] = "S"

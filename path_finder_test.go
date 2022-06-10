@@ -1,4 +1,4 @@
-package path
+package astar
 
 import (
 	"testing"
@@ -51,7 +51,7 @@ func Test_PathFinder(t *testing.T) {
 		Bytes:  buf,
 	}
 
-	path, _, err := FindPath(1, 0, 6, 28, &grid, true, false)
+	path, err := FindPath(&grid, 1, 0, 6, 28, true, false, true)
 	if err != nil {
 		t.Error(err)
 	}

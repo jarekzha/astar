@@ -1,4 +1,4 @@
-package path
+package astar
 
 import (
 	"math"
@@ -20,44 +20,72 @@ var locToParent = make(map[int]int)
 var SQRT2 = math.Sqrt2
 
 //Manhattan distance.
-func Heuristic(dx float64, dy float64) float64 {
+func heuristic(dx, dy float64) float64 {
 	return dx + dy
 }
 
-// Backtrace according to the parent records and return the path.
+// vector cross
+func cross(ax, ay, bx, by int) int {
+	return ax*by - ay*bx
+}
+
+// backtrace according to the parent records and return the path.
 // (including both start and end nodes)
 // int node End node
 // returns the path array
-func Backtrace(node int) ([]int, [][]int) {
-	path := []int{}
-	coordPath := [][]int{}
+func backtrace(node int, smooth bool) [][]int {
+	path := [][]int{}
 
-	path = append(path, node)
+	var lastVecX, lastVecY int
+
 	for locToParent[node] != 0 {
 		node = locToParent[node]
-		path = append(path, 0)
-		copy(path[1:], path)
-		path[0] = node
-
-		//append to coord path too
 		coords := []int{node >> 16, node & 0xffff}
-		coordPath = append(coordPath, []int{0})
-		copy(coordPath[1:], coordPath)
-		coordPath[0] = coords
+
+		replace := false
+		if smooth {
+			// ignore last collinear node
+			if len(path) > 0 {
+				vecX := coords[0] - path[0][0]
+				vecY := coords[1] - path[0][1]
+				if lastVecX != 0 || lastVecY != 0 {
+					if cross(vecX, vecY, lastVecX, lastVecY) == 0 {
+						// fmt.Printf("check corrd(%d,%d) vec(%d,%d) lastVec(%d,%d) replace\n",
+						// 	coords[0], coords[1],
+						// 	vecX, vecY, lastVecX, lastVecY)
+						replace = true
+					}
+				}
+
+				lastVecX = vecX
+				lastVecY = vecY
+			}
+		}
+
+		// append node
+		if !replace {
+			path = append(path, []int{0})
+			copy(path[1:], path)
+		}
+		path[0] = coords
 	}
-	return path, coordPath
+	return path
 }
 
-func FindPathByBrickLoc(start int, end int, theGrid *Grid) ([]int, [][]int, error) {
-	return FindPath(start>>16, start&0xffff, end>>16, end&0xffff, theGrid, false, false)
+func FindPathByBrickLoc(theGrid *Grid, start int, end int) ([][]int, error) {
+	return FindPath(grid,
+		start>>16, start&0xffff, end>>16, end&0xffff,
+		false, false, false)
 }
 
 // find a path of giving x, y brick locations
-func FindPath(startX int, startY int, endX int, endY int, theGrid *Grid, allowDiagonal bool, dontCrossCorners bool) ([]int, [][]int, error) {
+func FindPath(theGrid *Grid,
+	startX, startY, endX, endY int,
+	allowDiagonal, dontCrossCorners, smooth bool) ([][]int, error) {
 
 	//validate args
 	if startX < 0 || startY < 0 || endX < 0 || endY < 0 {
-		return nil, nil, errors.New("x and y positions cannot be less then 0")
+		return nil, errors.New("x and y positions cannot be less then 0")
 	}
 
 	startLoc = startX<<16 | startY
@@ -81,8 +109,8 @@ func FindPath(startX int, startY int, endX int, endY int, theGrid *Grid, allowDi
 
 		if node == endLoc {
 			//	fmt.Println("[syncfinder_astar::findPath] hit end brick")
-			path, coordPath := Backtrace(node)
-			return path, coordPath, nil
+			coordPath := backtrace(node, smooth)
+			return coordPath, nil
 		}
 
 		//get neighbors of the current node
@@ -117,7 +145,7 @@ func FindPath(startX int, startY int, endX int, endY int, theGrid *Grid, allowDi
 				locToG[neighbor] = ng
 
 				if locToH[neighbor] == 0 {
-					locToH[neighbor] = Heuristic(math.Abs(float64(x-endX)), math.Abs(float64(y-endY)))
+					locToH[neighbor] = heuristic(math.Abs(float64(x-endX)), math.Abs(float64(y-endY)))
 				}
 
 				locToF[neighbor] = int(locToG[neighbor] + locToH[neighbor])
@@ -137,5 +165,5 @@ func FindPath(startX int, startY int, endX int, endY int, theGrid *Grid, allowDi
 		}
 	}
 	// fail to find the path
-	return nil, nil, errors.New("failed to find the path")
+	return nil, errors.New("failed to find the path")
 }

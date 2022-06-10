@@ -1,4 +1,4 @@
-package path
+package astar
 
 //utils
 type Heap struct {

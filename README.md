@@ -1,6 +1,6 @@
 ## GO-PATH [WIP]
 
-A* pathfinding and optional smoothing
+A\* pathfinding and optional smoothing. Support the grid width, height in (0, 65535)
 
 ## Usage
 
@@ -58,8 +58,8 @@ array2d := [][]int{
 	}
 
 	fmt.Println(grid.ToString(1<<16|0, 6<<16|28, path))
-  
-  
+
+
 [Grid(width=30, height=30)]
 Dump: ░=walkable, ▓=blocked
 ▓S▓▓░░░▓▓▓▓░▓▓▓▓▓▓▓░▓▓▓▓▓░▓░▓▓
