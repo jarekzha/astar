@@ -24,20 +24,15 @@ func heuristic(dx, dy float64) float64 {
 	return dx + dy
 }
 
-// vector cross
-func cross(ax, ay, bx, by int) int {
-	return ax*by - ay*bx
-}
-
 // backtrace according to the parent records and return the path.
 // (including both start and end nodes)
 // int node End node
 // returns the path array
 func backtrace(node int, smooth bool) [][]int {
 	path := [][]int{}
+	var lastVecx, lastVecy int
 
-	var lastVecX, lastVecY int
-
+	// backtrace and ignore collinear node
 	for locToParent[node] != 0 {
 		node = locToParent[node]
 		coords := []int{node >> 16, node & 0xffff}
@@ -46,10 +41,10 @@ func backtrace(node int, smooth bool) [][]int {
 		if smooth {
 			// ignore last collinear node
 			if len(path) > 0 {
-				vecX := coords[0] - path[0][0]
-				vecY := coords[1] - path[0][1]
-				if lastVecX != 0 || lastVecY != 0 {
-					if cross(vecX, vecY, lastVecX, lastVecY) == 0 {
+				vecx := coords[0] - path[0][0]
+				vecy := coords[1] - path[0][1]
+				if lastVecx != 0 || lastVecy != 0 {
+					if cross(vecx, vecy, lastVecx, lastVecy) == 0 {
 						// fmt.Printf("check corrd(%d,%d) vec(%d,%d) lastVec(%d,%d) replace\n",
 						// 	coords[0], coords[1],
 						// 	vecX, vecY, lastVecX, lastVecY)
@@ -57,8 +52,8 @@ func backtrace(node int, smooth bool) [][]int {
 					}
 				}
 
-				lastVecX = vecX
-				lastVecY = vecY
+				lastVecx = vecx
+				lastVecy = vecy
 			}
 		}
 
@@ -69,6 +64,30 @@ func backtrace(node int, smooth bool) [][]int {
 		}
 		path[0] = coords
 	}
+
+	// trim corner
+	if smooth {
+		path = smoothPath(path)
+	}
+
+	return path
+}
+
+// smooth path by triming corner
+func smoothPath(path [][]int) [][]int {
+	if len(path) < 2 {
+		return path
+	}
+
+	for i := 1; i < len(path)-1; i++ {
+		pre := path[i-1]
+		next := path[i+1]
+		if grid.IsLineWalkable(pre[0], pre[1], next[0], next[1]) {
+			path = append(path[:i], path[i+1:]...)
+			i--
+		}
+	}
+
 	return path
 }
 

@@ -84,6 +84,58 @@ func (grid *Grid) IsWalkableAt(x int, y int) bool {
 
 }
 
+// Check line from a to b is walkable
+// (Also returns false if the position is outside the grid.)
+func (grid *Grid) IsLineWalkable(ax, ay, bx, by int) bool {
+	if !grid.IsWalkableAt(ax, ay) || !grid.IsWalkableAt(bx, by) {
+		return false
+	}
+
+	var k float64
+	var kn int
+	if ax == bx {
+		kn = 2
+		k = 0
+	} else {
+		kn = abs((by - ay) / (bx - ax))
+		k = float64(by-ay) / float64(bx-ax)
+	}
+
+	// traverse the line
+	if kn == 0 {
+		step := sign(bx - ax)
+		for x := ax; x != bx; x += step {
+			y := float64(ay) + float64(x-ax)*k
+			// fmt.Printf("check line(%d,%d) from a(%d,%d), b(%d,%d)\n", x, y, ax, ay, bx, by)
+			if !grid.IsWalkableAt(x, int(math.Ceil(y))) {
+				return false
+			}
+			if !grid.IsWalkableAt(x, int(math.Floor(y))) {
+				return false
+			}
+		}
+	} else {
+		step := sign(by - ay)
+		for y := ay; y != by; y += step {
+			if kn == 2 {
+				if !grid.IsWalkableAt(ax, y) {
+					return false
+				}
+			} else {
+				x := float64(ax) + float64(y-ay)/k
+				if !grid.IsWalkableAt(int(math.Ceil(x)), y) {
+					return false
+				}
+				if !grid.IsWalkableAt(int(math.Floor(x)), y) {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
 // Set whether the node on the given position is walkable.
 // NOTE: throws exception if the coordinate is not inside the grid.
 // int x - The x coordinate of the node.
