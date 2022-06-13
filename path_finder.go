@@ -100,7 +100,7 @@ func FindPathByBrickLoc(theGrid *Grid, start int, end int) ([][]int, error) {
 // find a path of giving x, y brick locations
 func FindPath(theGrid *Grid,
 	startX, startY, endX, endY int,
-	allowDiagonal, dontCrossCorners, smooth bool) ([][]int, error) {
+	allowDiagonal, crossCorners, smooth bool) ([][]int, error) {
 
 	//validate args
 	if startX < 0 || startY < 0 || endX < 0 || endY < 0 {
@@ -135,7 +135,7 @@ func FindPath(theGrid *Grid,
 		//get neighbors of the current node
 		nodeX := node >> 16
 		nodeY := node & 0xffff
-		neighbors := grid.GetNeighbors(nodeX, nodeY, allowDiagonal, dontCrossCorners)
+		neighbors := grid.GetNeighbors(nodeX, nodeY, allowDiagonal, crossCorners)
 
 		//		fmt.Println("[syncfinder_astar::findPath] process node:#{node}, x:#{nodeX}, y:#{nodeY},neighbors:#{neighbors}")
 

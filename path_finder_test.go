@@ -51,7 +51,7 @@ func Test_PathFinder(t *testing.T) {
 		Bytes:  buf,
 	}
 
-	path, err := FindPath(&grid, 1, 0, 6, 28, true, false, true)
+	path, err := FindPath(&grid, 1, 0, 6, 28, true, true, true)
 	if err != nil {
 		t.Error(err)
 	}

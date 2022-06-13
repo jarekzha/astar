@@ -94,7 +94,7 @@ func (grid *Grid) IsLineWalkable(ax, ay, bx, by int) bool {
 	var k float64
 	var kn int
 	if ax == bx {
-		kn = 2
+		kn = -1
 		k = 0
 	} else {
 		kn = abs((by - ay) / (bx - ax))
@@ -117,7 +117,7 @@ func (grid *Grid) IsLineWalkable(ax, ay, bx, by int) bool {
 	} else {
 		step := sign(by - ay)
 		for y := ay; y != by; y += step {
-			if kn == 2 {
+			if kn == -1 {
 				if !grid.IsWalkableAt(ax, y) {
 					return false
 				}
@@ -174,9 +174,9 @@ func (grid *Grid) SetWalkableAt(x int, y int, walkable bool) error {
 // int  x
 // int y
 // bool allowDiagonal
-// bool dontCrossCorners
+// bool crossCorners
 // returns []int a list of walkable neighbors brick loc
-func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, dontCrossCorners bool) []int {
+func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, crossCorners bool) []int {
 
 	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
 		return nil
@@ -222,16 +222,16 @@ func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, dontCrossCorner
 		return neighbors
 	}
 
-	if dontCrossCorners == true {
-		d0 = s3 && s0
-		d1 = s0 && s1
-		d2 = s1 && s2
-		d3 = s2 && s3
-	} else {
+	if crossCorners {
 		d0 = s3 || s0
 		d1 = s0 || s1
 		d2 = s1 || s2
 		d3 = s2 || d3
+	} else {
+		d0 = s3 && s0
+		d1 = s0 && s1
+		d2 = s1 && s2
+		d3 = s2 && s3
 	}
 
 	// ↖
@@ -250,7 +250,6 @@ func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, dontCrossCorner
 	}
 
 	// ↙
-
 	if d3 && grid.IsWalkableAt(x-1, y+1) {
 		neighbors = append(neighbors, (x-1)<<16|(y+1))
 	}
