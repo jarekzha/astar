@@ -45,13 +45,23 @@ func Test_PathFinder(t *testing.T) {
 		t.Error(err)
 	}
 
-	grid := Grid{
+	grid := &Grid{
 		Width:  width,
 		Height: height,
 		Bytes:  buf,
 	}
 
-	path, err := FindPath(&grid, 1, 0, 6, 28, true, true, true)
+	grid.SetWalkableAt(1, 2, false)
+
+	path, err := FindPath(grid, 1, 0, 6, 28, true, true, true)
+	if err != nil {
+		t.Error(err)
+	}
+	path, err = FindPath(grid, 1, 0, 6, 28, true, true, true)
+	if err != nil {
+		t.Error(err)
+	}
+	path, err = FindPath(grid, 1, 0, 6, 28, true, true, true)
 	if err != nil {
 		t.Error(err)
 	}

@@ -81,7 +81,28 @@ func (grid *Grid) IsWalkableAt(x int, y int) bool {
 	// NOTE:
 	// 1: means blocked, 0: means walkable
 	return (bytef >> offset & 1) == 0
+}
 
+// Set whether the node on the given position is walkable.
+// NOTE: throws exception if the coordinate is not inside the grid.
+// int x - The x coordinate of the node.
+// int y - The y coordinate of the node.
+func (grid *Grid) SetWalkableAt(x int, y int, walkable bool) error {
+	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
+		return errors.New("Out of bounds")
+	}
+
+	index := (y*grid.Width + x)
+	bytePos := index >> 3
+	offset := 7 - index%8
+	bytef := grid.Bytes[bytePos]
+
+	if walkable {
+		grid.Bytes[bytePos] = bytef & (0 ^ 1<<offset)
+	} else {
+		grid.Bytes[bytePos] = bytef ^ 1<<offset
+	}
+	return nil
 }
 
 // Check line from a to b is walkable
@@ -136,26 +157,6 @@ func (grid *Grid) IsLineWalkable(ax, ay, bx, by int) bool {
 	return true
 }
 
-// Set whether the node on the given position is walkable.
-// NOTE: throws exception if the coordinate is not inside the grid.
-// int x - The x coordinate of the node.
-// int y - The y coordinate of the node.
-func (grid *Grid) SetWalkableAt(x int, y int, walkable bool) error {
-	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
-		return errors.New("Out of bounds")
-	}
-
-	index := (y*grid.Width + x)
-	bytePos := index >> 3
-	offset := 7 - index%8
-	bytef := grid.Bytes[bytePos]
-
-	if !grid.IsWalkableAt(x, y) {
-		grid.Bytes[bytePos] = bytef ^ 1<<offset
-	}
-	return nil
-}
-
 // returns []int each uint present x(high 16 bit) and y(low 16 bit)
 // Get the neighbors of the given node.
 //
@@ -177,7 +178,6 @@ func (grid *Grid) SetWalkableAt(x int, y int, walkable bool) error {
 // bool crossCorners
 // returns []int a list of walkable neighbors brick loc
 func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, crossCorners bool) []int {
-
 	if x < 0 || y < 0 || x >= grid.Width || y >= grid.Height { //out of bounds
 		return nil
 	}

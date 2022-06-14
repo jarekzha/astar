@@ -19,6 +19,20 @@ var locToParent = make(map[int]int)
 
 var SQRT2 = math.Sqrt2
 
+// reset for repeat running
+func reset() {
+	startLoc = 0
+	endLoc = 0
+	grid = nil
+	locToClosed = make(map[int]bool)
+	locToOpen = make(map[int]bool)
+	locToG = make(map[int]float64)
+	locToH = make(map[int]float64)
+	locToF = make(map[int]int)
+	locToParent = make(map[int]int)
+	openList.Reset(locToF)
+}
+
 //Manhattan distance.
 func heuristic(dx, dy float64) float64 {
 	return math.Sqrt(dx*dx + dy*dy)
@@ -108,6 +122,8 @@ func FindPath(theGrid *Grid,
 		return nil, errors.New("x and y positions cannot be less then 0")
 	}
 
+	reset()
+
 	startLoc = startX<<16 | startY
 	endLoc = endX<<16 | endY
 	grid = theGrid
@@ -116,8 +132,6 @@ func FindPath(theGrid *Grid,
 	locToG[startLoc] = 0
 	locToF[startLoc] = 0
 
-	openList.Reset(locToF)
-
 	openList.Push(startLoc)
 	locToOpen[startLoc] = true
 
@@ -125,13 +139,13 @@ func FindPath(theGrid *Grid,
 		//pop the position of node which has the minimum `f` value.
 		node := openList.Pop()
 
-		locToClosed[node] = true
-
 		if node == endLoc {
 			//	fmt.Println("[syncfinder_astar::findPath] hit end brick")
 			coordPath := backtrace(node, smooth)
 			return coordPath, nil
 		}
+
+		locToClosed[node] = true
 
 		//get neighbors of the current node
 		nodeX := node >> 16
