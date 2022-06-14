@@ -21,7 +21,7 @@ var SQRT2 = math.Sqrt2
 
 //Manhattan distance.
 func heuristic(dx, dy float64) float64 {
-	return math.Sqrt(dx*dx + dy*dx)
+	return math.Sqrt(dx*dx + dy*dy)
 }
 
 // backtrace according to the parent records and return the path.
