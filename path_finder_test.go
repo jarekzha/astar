@@ -56,5 +56,5 @@ func Test_PathFinder(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Log(grid.ToString(1<<16|0, 6<<16|28, path))
+	t.Log(grid.ToString(path))
 }

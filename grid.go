@@ -226,7 +226,7 @@ func (grid *Grid) GetNeighbors(x int, y int, allowDiagonal bool, crossCorners bo
 		d0 = s3 || s0
 		d1 = s0 || s1
 		d2 = s1 || s2
-		d3 = s2 || d3
+		d3 = s2 || s3
 	} else {
 		d0 = s3 && s0
 		d1 = s0 && s1
@@ -268,21 +268,23 @@ func (grid *Grid) GetRandomWalkableBrick() int {
 }
 
 // print out the block data for human inspection
-// @param  startLoc the start brick loc
-// @param  endLoc the end brick loc
 // @param  path array of point
 // returns a string to describe this instance
-func (grid *Grid) ToString(startLoc int, endLoc int, path [][]int) string {
+func (grid *Grid) ToString(path [][]int) string {
 	markpoints := make(map[int]string)
 
 	for i, loc := range path {
 		x := loc[0]
 		y := loc[1]
-		markpoints[x<<16|y] = strconv.Itoa(i % 10)
+		node := x<<16 | y
+		if i == 0 {
+			markpoints[node] = "S"
+		} else if i == len(path)-1 {
+			markpoints[node] = "E"
+		} else {
+			markpoints[node] = strconv.Itoa((i - 1) % 10)
+		}
 	}
-
-	markpoints[startLoc] = "S"
-	markpoints[endLoc] = "E"
 
 	result := fmt.Sprintf("[Grid(width=%v, height=%v)]\nDump: ░=walkable, ▓=blocked", grid.Width, grid.Height)
 

@@ -21,7 +21,7 @@ var SQRT2 = math.Sqrt2
 
 //Manhattan distance.
 func heuristic(dx, dy float64) float64 {
-	return dx + dy
+	return math.Sqrt(dx*dx + dy*dx)
 }
 
 // backtrace according to the parent records and return the path.
@@ -32,29 +32,30 @@ func backtrace(node int, smooth bool) [][]int {
 	path := [][]int{}
 	var lastVecx, lastVecy int
 
+	// append end node
+	coords := []int{node >> 16, node & 0xffff}
+	path = append(path, coords)
+
 	// backtrace and ignore collinear node
 	for locToParent[node] != 0 {
 		node = locToParent[node]
-		coords := []int{node >> 16, node & 0xffff}
+		coords = []int{node >> 16, node & 0xffff}
 
 		replace := false
 		if smooth {
-			// ignore last collinear node
-			if len(path) > 0 {
-				vecx := coords[0] - path[0][0]
-				vecy := coords[1] - path[0][1]
-				if lastVecx != 0 || lastVecy != 0 {
-					if cross(vecx, vecy, lastVecx, lastVecy) == 0 {
-						// fmt.Printf("check corrd(%d,%d) vec(%d,%d) lastVec(%d,%d) replace\n",
-						// 	coords[0], coords[1],
-						// 	vecX, vecY, lastVecX, lastVecY)
-						replace = true
-					}
+			vecx := coords[0] - path[0][0]
+			vecy := coords[1] - path[0][1]
+			if lastVecx != 0 || lastVecy != 0 {
+				if cross(vecx, vecy, lastVecx, lastVecy) == 0 {
+					// fmt.Printf("check corrd(%d,%d) vec(%d,%d) lastVec(%d,%d) replace\n",
+					// 	coords[0], coords[1],
+					// 	vecX, vecY, lastVecX, lastVecY)
+					replace = true
 				}
-
-				lastVecx = vecx
-				lastVecy = vecy
 			}
+
+			lastVecx = vecx
+			lastVecy = vecy
 		}
 
 		// append node
